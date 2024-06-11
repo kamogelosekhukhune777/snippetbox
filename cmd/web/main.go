@@ -1,11 +1,15 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 )
 
 func main() {
+	addr := flag.String("addr", ":4000", "HTTP network address")
+	flag.Parse()
+
 	// Use the http.NewServeMux() function to initialize a new servemux
 	mux := http.NewServeMux()
 
@@ -17,9 +21,7 @@ func main() {
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
 	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
-	// Print a log a message to say that the server is starting.
-	log.Print("starting server on :4000")
-
-	err := http.ListenAndServe(":4000", mux)
+	log.Printf("starting server on %s", *addr)
+	err := http.ListenAndServe(*addr, mux)
 	log.Fatal(err)
 }
