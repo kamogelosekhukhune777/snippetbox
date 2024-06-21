@@ -65,5 +65,6 @@ func openDB(dsn string) (*sql.DB, error) {
 		db.Close()
 		return nil, err
 	}
+
 	return db, nil
 }
