@@ -47,13 +47,9 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
 WHERE expires > UTC_TIMESTAMP() AND id = ?`
 
-	row := m.DB.QueryRow(stmt, id)
-	// Initialize a new zeroed Snippet struct.
 	var s Snippet
 
-	// row.Scan() to copy the values from each field in sql.Row to the
-	// corresponding field in the Snippet struct.
-	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	err := m.DB.QueryRow(stmt, id).Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Snippet{}, ErrNoRecord
@@ -63,7 +59,6 @@ WHERE expires > UTC_TIMESTAMP() AND id = ?`
 	}
 
 	return s, nil
-
 }
 
 // This will return the 10 most recently created snippets.
