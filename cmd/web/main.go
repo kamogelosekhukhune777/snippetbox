@@ -49,13 +49,10 @@ func main() {
 	// Initialize a decoder instance...
 	formDecoder := form.NewDecoder()
 
-	// Use the scs.New() function to initialize a new session manager. Then we
-	// configure it to use our MySQL database as the session store, and set a
-	// lifetime of 12 hours (so that sessions automatically expire 12 hours
-	// after first being created).
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Cookie.Secure = true
 
 	app := &application{
 		logger:         logger,
@@ -73,7 +70,7 @@ func main() {
 
 	logger.Info("starting server", "addr", srv.Addr)
 
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/localhost.pem", "./tls/localhost-key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }
