@@ -18,7 +18,9 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 		uri    = r.URL.RequestURI()
 		trace  = string(debug.Stack())
 	)
+
 	app.logger.Error(err.Error(), "method", method, "uri", uri, "trace", trace)
+
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
@@ -64,6 +66,7 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	if err != nil {
 		return err
 	}
+
 	// Call Decode() on our decoder instance, passing the target destination as
 	// the first parameter.
 	err = app.formDecoder.Decode(dst, r.PostForm)
@@ -79,13 +82,17 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 		// For all other errors, we return them as normal.
 		return err
 	}
+
 	return nil
 }
 
-// Return true if the current request is from an authenticated user, otherwise
-// return false.
 func (app *application) isAuthenticated(r *http.Request) bool {
-	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+
+	return isAuthenticated
 }
 
 // Create a NoSurf middleware function which uses a customized CSRF cookie with
